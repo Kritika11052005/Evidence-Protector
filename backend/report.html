@@ -1,0 +1,429 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Evidence Protector - Forensic Report</title>
+<style>
+    @import url('https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;700&family=Inter:wght@300;400;600;700&display=swap');
+
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body {
+        font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+        background: #0a0e1a;
+        color: #c8d6e5;
+        min-height: 100vh;
+        line-height: 1.6;
+    }
+    .container { max-width: 1100px; margin: 0 auto; padding: 40px 20px; }
+
+    /* Header */
+    .header {
+        text-align: center;
+        margin-bottom: 40px;
+        padding: 40px 20px;
+        background: linear-gradient(135deg, #0d1526 0%, #141e33 100%);
+        border-radius: 16px;
+        border: 1px solid #1a2744;
+        position: relative;
+        overflow: hidden;
+    }
+    .header::before {
+        content: '';
+        position: absolute;
+        top: 0; left: 0; right: 0;
+        height: 3px;
+        background: linear-gradient(90deg, transparent, #00ff88, transparent);
+    }
+    .header h1 {
+        font-size: 2.2em;
+        font-weight: 700;
+        color: #00ff88;
+        letter-spacing: 2px;
+        text-transform: uppercase;
+        margin-bottom: 8px;
+        text-shadow: 0 0 30px rgba(0, 255, 136, 0.3);
+    }
+    .header .subtitle {
+        font-size: 1em;
+        color: #7f8fa6;
+        font-weight: 300;
+    }
+
+    /* Stats bar */
+    .stats-bar {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+        gap: 16px;
+        margin-bottom: 36px;
+    }
+    .stat-card {
+        background: linear-gradient(135deg, #111827 0%, #1a2332 100%);
+        border-radius: 12px;
+        padding: 24px;
+        text-align: center;
+        border: 1px solid #1e2d44;
+        transition: transform 0.2s, border-color 0.2s;
+    }
+    .stat-card:hover {
+        transform: translateY(-2px);
+        border-color: #00ff88;
+    }
+    .stat-number {
+        font-size: 2.4em;
+        font-weight: 700;
+        color: #ffffff;
+        display: block;
+    }
+    .stat-number.critical { color: #ff4444; }
+    .stat-number.score { color: #00ff88; }
+    .stat-label {
+        font-size: 0.85em;
+        color: #7f8fa6;
+        text-transform: uppercase;
+        letter-spacing: 1px;
+        margin-top: 4px;
+    }
+
+    /* Meta info */
+    .meta-info {
+        background: #111827;
+        border-radius: 12px;
+        padding: 20px 28px;
+        margin-bottom: 36px;
+        border: 1px solid #1e2d44;
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+        gap: 12px;
+    }
+    .meta-info-item { font-size: 0.9em; }
+    .meta-info-item span:first-child { color: #7f8fa6; margin-right: 8px; }
+    .meta-info-item span:last-child { color: #e0e0e0; font-weight: 600; }
+
+    /* Section titles */
+    .section-title {
+        font-size: 1.3em;
+        font-weight: 700;
+        color: #00ff88;
+        margin: 36px 0 20px;
+        padding-bottom: 8px;
+        border-bottom: 2px solid #1a2744;
+        text-transform: uppercase;
+        letter-spacing: 1px;
+    }
+
+    /* Heatmap */
+    .heatmap-grid {
+        display: grid;
+        grid-template-columns: repeat(6, 1fr);
+        gap: 8px;
+        margin-bottom: 12px;
+    }
+    .heat-cell {
+        border-radius: 8px;
+        padding: 14px 8px;
+        text-align: center;
+        border: 1px solid #1e2d44;
+        transition: transform 0.15s;
+    }
+    .heat-cell:hover { transform: scale(1.05); }
+    .heat-hour {
+        display: block;
+        font-size: 0.8em;
+        color: #7f8fa6;
+        font-weight: 600;
+    }
+    .heat-count {
+        display: block;
+        font-size: 1.4em;
+        font-weight: 700;
+        color: #fff;
+        margin-top: 2px;
+    }
+    .peak-text {
+        text-align: center;
+        color: #7f8fa6;
+        font-size: 0.9em;
+        margin-top: 8px;
+    }
+    .peak-text span { color: #00ff88; font-weight: 600; }
+
+    /* Gap cards */
+    .gap-card {
+        background: linear-gradient(135deg, #111827 0%, #151d2e 100%);
+        border-radius: 12px;
+        padding: 28px;
+        margin-bottom: 24px;
+        border: 1px solid #1e2d44;
+    }
+    .gap-header {
+        display: flex;
+        align-items: center;
+        gap: 14px;
+        margin-bottom: 20px;
+    }
+    .severity-badge {
+        padding: 4px 14px;
+        border-radius: 20px;
+        font-size: 0.75em;
+        font-weight: 700;
+        color: #fff;
+        text-transform: uppercase;
+        letter-spacing: 1px;
+    }
+    .gap-title {
+        font-size: 1.2em;
+        font-weight: 700;
+        color: #fff;
+    }
+    .gap-meta {
+        display: grid;
+        gap: 8px;
+        margin-bottom: 20px;
+    }
+    .meta-row {
+        display: flex;
+        justify-content: space-between;
+        padding: 6px 0;
+        border-bottom: 1px solid #1a2035;
+    }
+    .meta-label {
+        color: #7f8fa6;
+        font-size: 0.9em;
+    }
+    .meta-value {
+        color: #e0e0e0;
+        font-weight: 600;
+        font-size: 0.9em;
+    }
+
+    /* Score */
+    .score-section {
+        margin: 20px 0;
+        padding: 16px;
+        background: #0d1220;
+        border-radius: 8px;
+    }
+    .score-label {
+        font-weight: 700;
+        color: #fff;
+        margin-bottom: 10px;
+        font-size: 1em;
+    }
+    .score-bar-bg {
+        width: 100%;
+        height: 10px;
+        background: #1a2035;
+        border-radius: 5px;
+        overflow: hidden;
+    }
+    .score-bar-fill {
+        height: 100%;
+        border-radius: 5px;
+        transition: width 0.5s ease;
+    }
+    .score-reasons {
+        margin-top: 8px;
+        font-size: 0.82em;
+        color: #7f8fa6;
+        font-style: italic;
+    }
+
+    /* Context */
+    .context-section { margin-top: 20px; }
+    .context-title {
+        font-size: 0.85em;
+        font-weight: 600;
+        color: #00ff88;
+        margin-bottom: 6px;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+    }
+    .context-block {
+        font-family: 'JetBrains Mono', 'Courier New', monospace;
+        font-size: 0.82em;
+        background: #080c16;
+        color: #b0c4de;
+        padding: 14px;
+        border-radius: 6px;
+        overflow-x: auto;
+        margin-bottom: 14px;
+        border: 1px solid #1a2035;
+        line-height: 1.7;
+    }
+
+    /* Footer */
+    .footer {
+        text-align: center;
+        margin-top: 50px;
+        padding: 20px;
+        color: #4a5568;
+        font-size: 0.8em;
+    }
+</style>
+</head>
+<body>
+<div class="container">
+
+    <div class="header">
+        <h1>Evidence Protector</h1>
+        <div class="subtitle">Forensic Log Integrity Analysis Report</div>
+    </div>
+
+    <div class="stats-bar">
+        <div class="stat-card">
+            <span class="stat-number">3</span>
+            <span class="stat-label">Total Gaps</span>
+        </div>
+        <div class="stat-card">
+            <span class="stat-number critical">0</span>
+            <span class="stat-label">Critical</span>
+        </div>
+        <div class="stat-card">
+            <span class="stat-number">3</span>
+            <span class="stat-label">Medium</span>
+        </div>
+        <div class="stat-card">
+            <span class="stat-number">0</span>
+            <span class="stat-label">Low</span>
+        </div>
+        <div class="stat-card">
+            <span class="stat-number score">58</span>
+            <span class="stat-label">Avg Tamper Score</span>
+        </div>
+    </div>
+
+    <div class="meta-info">
+        <div class="meta-info-item"><span>Log File:</span><span>sample.log</span></div>
+        <div class="meta-info-item"><span>Threshold:</span><span>60s</span></div>
+        <div class="meta-info-item"><span>Lines Processed:</span><span>51</span></div>
+        <div class="meta-info-item"><span>Malformed Skipped:</span><span>0</span></div>
+    </div>
+
+    <div class="section-title">Hourly Gap Heatmap</div>
+    <div class="heatmap-grid">
+        <div class="heat-cell" style="background:#1a1f36;"><span class="heat-hour">00h</span><span class="heat-count">0</span></div>
+<div class="heat-cell" style="background:#1a1f36;"><span class="heat-hour">01h</span><span class="heat-count">0</span></div>
+<div class="heat-cell" style="background:#1a1f36;"><span class="heat-hour">02h</span><span class="heat-count">0</span></div>
+<div class="heat-cell" style="background:#3a7a4a;"><span class="heat-hour">03h</span><span class="heat-count">2</span></div>
+<div class="heat-cell" style="background:#1a1f36;"><span class="heat-hour">04h</span><span class="heat-count">0</span></div>
+<div class="heat-cell" style="background:#1a1f36;"><span class="heat-hour">05h</span><span class="heat-count">0</span></div>
+<div class="heat-cell" style="background:#1a1f36;"><span class="heat-hour">06h</span><span class="heat-count">0</span></div>
+<div class="heat-cell" style="background:#1a1f36;"><span class="heat-hour">07h</span><span class="heat-count">0</span></div>
+<div class="heat-cell" style="background:#1a1f36;"><span class="heat-hour">08h</span><span class="heat-count">0</span></div>
+<div class="heat-cell" style="background:#1a1f36;"><span class="heat-hour">09h</span><span class="heat-count">0</span></div>
+<div class="heat-cell" style="background:#1a1f36;"><span class="heat-hour">10h</span><span class="heat-count">0</span></div>
+<div class="heat-cell" style="background:#1a1f36;"><span class="heat-hour">11h</span><span class="heat-count">0</span></div>
+<div class="heat-cell" style="background:#1a1f36;"><span class="heat-hour">12h</span><span class="heat-count">0</span></div>
+<div class="heat-cell" style="background:#1a1f36;"><span class="heat-hour">13h</span><span class="heat-count">0</span></div>
+<div class="heat-cell" style="background:#1a1f36;"><span class="heat-hour">14h</span><span class="heat-count">0</span></div>
+<div class="heat-cell" style="background:#1a1f36;"><span class="heat-hour">15h</span><span class="heat-count">0</span></div>
+<div class="heat-cell" style="background:#1a1f36;"><span class="heat-hour">16h</span><span class="heat-count">0</span></div>
+<div class="heat-cell" style="background:#1a1f36;"><span class="heat-hour">17h</span><span class="heat-count">0</span></div>
+<div class="heat-cell" style="background:#1a1f36;"><span class="heat-hour">18h</span><span class="heat-count">0</span></div>
+<div class="heat-cell" style="background:#1a1f36;"><span class="heat-hour">19h</span><span class="heat-count">0</span></div>
+<div class="heat-cell" style="background:#2a4a3a;"><span class="heat-hour">20h</span><span class="heat-count">1</span></div>
+<div class="heat-cell" style="background:#1a1f36;"><span class="heat-hour">21h</span><span class="heat-count">0</span></div>
+<div class="heat-cell" style="background:#1a1f36;"><span class="heat-hour">22h</span><span class="heat-count">0</span></div>
+<div class="heat-cell" style="background:#1a1f36;"><span class="heat-hour">23h</span><span class="heat-count">0</span></div>
+
+    </div>
+    <div class="peak-text">Peak suspicious window: <span>03:00 - 04:00</span></div>
+
+    <div class="section-title">Detected Gaps</div>
+    
+        <div class="gap-card" style="border-left: 4px solid #ff8800;">
+            <div class="gap-header">
+                <span class="severity-badge" style="background:#ff8800;">MEDIUM</span>
+                <span class="gap-title">GAP #1</span>
+            </div>
+            <div class="gap-meta">
+                <div class="meta-row"><span class="meta-label">Start Time</span><span class="meta-value">2008-11-09 20:35:28</span></div>
+                <div class="meta-row"><span class="meta-label">End Time</span><span class="meta-value">2008-11-09 20:43:52</span></div>
+                <div class="meta-row"><span class="meta-label">Duration</span><span class="meta-value">500 seconds (8 min 20 sec)</span></div>
+                <div class="meta-row"><span class="meta-label">Pattern</span><span class="meta-value" style="color:#00ff88;">POST-AUTH LOG WIPE</span></div>
+                <div class="meta-row"><span class="meta-label">MITRE ATT&CK</span><span class="meta-value">T1070.001 &mdash; Indicator Removal on Host: Clear Linux Logs</span></div>
+            </div>
+            <div class="score-section">
+                <div class="score-label">Tamper Score: 65/100</div>
+                <div class="score-bar-bg"><div class="score-bar-fill" style="width:65%;background:#ff8800;"></div></div>
+                <div class="score-reasons">duration>5min (+40) | post-auth gap (+25)</div>
+            </div>
+            <div class="context-section">
+                <div class="context-title">Context Before Gap</div>
+                <pre class="context-block">  081109 203524 148 INFO hdfs.DataNode: access granted for /etc/shadow
+  081109 203526 148 INFO hdfs.DataNode: session opened for user root
+  081109 203528 148 INFO hdfs.DataNode: user root authenticated via kerberos</pre>
+                <div class="context-title">Context After Gap</div>
+                <pre class="context-block">  081109 204348 148 INFO hdfs.DataNode: session resumed after maintenance
+  081109 204350 148 INFO hdfs.DataNode: verifying data integrity checksums
+  081109 204352 148 INFO hdfs.DataNode: integrity check passed for blk_002</pre>
+            </div>
+        </div>
+        
+        <div class="gap-card" style="border-left: 4px solid #ff8800;">
+            <div class="gap-header">
+                <span class="severity-badge" style="background:#ff8800;">MEDIUM</span>
+                <span class="gap-title">GAP #2</span>
+            </div>
+            <div class="gap-meta">
+                <div class="meta-row"><span class="meta-label">Start Time</span><span class="meta-value">2008-11-09 03:00:04</span></div>
+                <div class="meta-row"><span class="meta-label">End Time</span><span class="meta-value">2008-11-09 03:12:08</span></div>
+                <div class="meta-row"><span class="meta-label">Duration</span><span class="meta-value">720 seconds (12 min 0 sec)</span></div>
+                <div class="meta-row"><span class="meta-label">Pattern</span><span class="meta-value" style="color:#00ff88;">OFF-HOURS EVIDENCE REMOVAL</span></div>
+                <div class="meta-row"><span class="meta-label">MITRE ATT&CK</span><span class="meta-value">T1070 &mdash; Indicator Removal on Host</span></div>
+            </div>
+            <div class="score-section">
+                <div class="score-label">Tamper Score: 62/100</div>
+                <div class="score-bar-bg"><div class="score-bar-fill" style="width:62%;background:#ff8800;"></div></div>
+                <div class="score-reasons">duration>5min (+40) | night-window 02-05h (+22)</div>
+            </div>
+            <div class="context-section">
+                <div class="context-title">Context Before Gap</div>
+                <pre class="context-block">  081109 030000 148 INFO hdfs.DataNode: nightly batch job starting
+  081109 030002 148 INFO hdfs.DataNode: loading audit records from buffer
+  081109 030004 148 INFO hdfs.DataNode: processing deferred writes</pre>
+                <div class="context-title">Context After Gap</div>
+                <pre class="context-block">  081109 031204 148 INFO hdfs.DataNode: system health check resumed
+  081109 031206 148 INFO hdfs.DataNode: memory usage within normal range
+  081109 031208 148 INFO hdfs.DataNode: CPU load average: 0.42</pre>
+            </div>
+        </div>
+        
+        <div class="gap-card" style="border-left: 4px solid #ff8800;">
+            <div class="gap-header">
+                <span class="severity-badge" style="background:#ff8800;">MEDIUM</span>
+                <span class="gap-title">GAP #3</span>
+            </div>
+            <div class="gap-meta">
+                <div class="meta-row"><span class="meta-label">Start Time</span><span class="meta-value">2008-11-09 03:12:30</span></div>
+                <div class="meta-row"><span class="meta-label">End Time</span><span class="meta-value">2008-11-09 03:16:32</span></div>
+                <div class="meta-row"><span class="meta-label">Duration</span><span class="meta-value">120 seconds (2 min 0 sec)</span></div>
+                <div class="meta-row"><span class="meta-label">Pattern</span><span class="meta-value" style="color:#00ff88;">RAPID LOG FLOODING</span></div>
+                <div class="meta-row"><span class="meta-label">MITRE ATT&CK</span><span class="meta-value">T1070.002 &mdash; Indicator Removal on Host: Clear Linux Audit Logs</span></div>
+            </div>
+            <div class="score-section">
+                <div class="score-label">Tamper Score: 47/100</div>
+                <div class="score-bar-bg"><div class="score-bar-fill" style="width:47%;background:#ff8800;"></div></div>
+                <div class="score-reasons">post-auth gap (+25) | night-window 02-05h (+22)</div>
+            </div>
+            <div class="context-section">
+                <div class="context-title">Context Before Gap</div>
+                <pre class="context-block">  081109 031226 148 INFO hdfs.DataNode: connection pool refreshed
+  081109 031228 148 INFO hdfs.DataNode: pending writes flushed to disk
+  081109 031230 148 INFO hdfs.DataNode: active client sessions: 3</pre>
+                <div class="context-title">Context After Gap</div>
+                <pre class="context-block">  081109 031430 148 INFO hdfs.DataNode: token refresh triggered
+  081109 031432 148 INFO hdfs.DataNode: client session timeout warning
+  081109 031632 148 INFO hdfs.DataNode: block report generation started</pre>
+            </div>
+        </div>
+        
+
+    <div class="footer">
+        Generated by Evidence Protector &mdash; 2026-03-28 02:29:40
+    </div>
+
+</div>
+</body>
+</html>

@@ -1,0 +1,93 @@
+{
+  "metadata": {
+    "file": "sample.log",
+    "threshold_seconds": 60,
+    "generated_at": "2026-03-27 10:39:14",
+    "lines_processed": 51,
+    "malformed_skipped": 0
+  },
+  "summary": {
+    "total_gaps": 3,
+    "critical": 0,
+    "medium": 3,
+    "low": 0,
+    "avg_tamper_score": 58
+  },
+  "gaps": [
+    {
+      "gap_number": 1,
+      "start_time": "2008-11-09 20:35:28",
+      "end_time": "2008-11-09 20:43:52",
+      "duration_seconds": 500,
+      "context_before": [
+        "081109 203524 148 INFO hdfs.DataNode: access granted for /etc/shadow",
+        "081109 203526 148 INFO hdfs.DataNode: session opened for user root",
+        "081109 203528 148 INFO hdfs.DataNode: user root authenticated via kerberos"
+      ],
+      "context_after": [
+        "081109 204348 148 INFO hdfs.DataNode: session resumed after maintenance",
+        "081109 204350 148 INFO hdfs.DataNode: verifying data integrity checksums",
+        "081109 204352 148 INFO hdfs.DataNode: integrity check passed for blk_002"
+      ],
+      "preceding_line": "081109 203528 148 INFO hdfs.DataNode: user root authenticated via kerberos",
+      "score": 65,
+      "score_reasons": [
+        "duration>5min (+40)",
+        "post-auth gap (+25)"
+      ],
+      "severity": "MEDIUM",
+      "pattern": "POST-AUTH LOG WIPE",
+      "mitre_id": "T1070.001"
+    },
+    {
+      "gap_number": 2,
+      "start_time": "2008-11-09 03:00:04",
+      "end_time": "2008-11-09 03:12:08",
+      "duration_seconds": 720,
+      "context_before": [
+        "081109 030000 148 INFO hdfs.DataNode: nightly batch job starting",
+        "081109 030002 148 INFO hdfs.DataNode: loading audit records from buffer",
+        "081109 030004 148 INFO hdfs.DataNode: processing deferred writes"
+      ],
+      "context_after": [
+        "081109 031204 148 INFO hdfs.DataNode: system health check resumed",
+        "081109 031206 148 INFO hdfs.DataNode: memory usage within normal range",
+        "081109 031208 148 INFO hdfs.DataNode: CPU load average: 0.42"
+      ],
+      "preceding_line": "081109 030004 148 INFO hdfs.DataNode: processing deferred writes",
+      "score": 62,
+      "score_reasons": [
+        "duration>5min (+40)",
+        "night-window 02-05h (+22)"
+      ],
+      "severity": "MEDIUM",
+      "pattern": "OFF-HOURS EVIDENCE REMOVAL",
+      "mitre_id": "T1070"
+    },
+    {
+      "gap_number": 3,
+      "start_time": "2008-11-09 03:12:30",
+      "end_time": "2008-11-09 03:16:32",
+      "duration_seconds": 120,
+      "context_before": [
+        "081109 031226 148 INFO hdfs.DataNode: connection pool refreshed",
+        "081109 031228 148 INFO hdfs.DataNode: pending writes flushed to disk",
+        "081109 031230 148 INFO hdfs.DataNode: active client sessions: 3"
+      ],
+      "context_after": [
+        "081109 031430 148 INFO hdfs.DataNode: token refresh triggered",
+        "081109 031432 148 INFO hdfs.DataNode: client session timeout warning",
+        "081109 031632 148 INFO hdfs.DataNode: block report generation started"
+      ],
+      "preceding_line": "081109 031230 148 INFO hdfs.DataNode: active client sessions: 3",
+      "score": 47,
+      "score_reasons": [
+        "post-auth gap (+25)",
+        "night-window 02-05h (+22)"
+      ],
+      "severity": "MEDIUM",
+      "pattern": "RAPID LOG FLOODING",
+      "mitre_id": "T1070.002"
+    }
+  ]
+}
