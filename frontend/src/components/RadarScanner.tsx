@@ -2,7 +2,6 @@
 import React, { useEffect, useState } from 'react'
 
 const RadarScanner: React.FC = () => {
-  const [scanAngle, setScanAngle] = useState(0)
   const [blips, setBlips] = useState<Array<{ id: number; x: number; y: number; opacity: number; delay: number }>>([])
   const [statusText, setStatusText] = useState('SCANNING...')
 

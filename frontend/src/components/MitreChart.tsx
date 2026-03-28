@@ -6,6 +6,7 @@ import {
   LinearScale,
   BarElement,
   Tooltip,
+  TooltipItem,
 } from 'chart.js'
 import { Bar } from 'react-chartjs-2'
 import { Gap } from "@/types"
@@ -77,14 +78,15 @@ const MitreChart: React.FC<MitreChartProps> = ({ gaps }) => {
         padding: 12,
         displayColors: false,
         callbacks: {
-          title: (items: { dataIndex: number }[]) => {
+          title: (items: TooltipItem<"bar">[]) => {
             const idx = items[0].dataIndex
             return labels[idx]
           },
-          label: (context: { raw: number; dataIndex: number }) => {
+          label: (context: TooltipItem<"bar">) => {
             const pattern = patterns[context.dataIndex]
+            const rawValue = context.raw as number
             return [
-              ` ${context.raw} hit${context.raw > 1 ? 's' : ''}`,
+              ` ${rawValue} hit${rawValue > 1 ? 's' : ''}`,
               ` ${pattern}`
             ]
           }

@@ -5,6 +5,7 @@ import {
   ArcElement,
   Tooltip,
   Legend,
+  TooltipItem
 } from 'chart.js'
 import { Doughnut } from 'react-chartjs-2'
 
@@ -68,9 +69,10 @@ const SeverityChart: React.FC<SeverityChartProps> = ({ critical, medium, low, av
         padding: 12,
         displayColors: true,
         callbacks: {
-          label: (context: { raw: number; label: string }) => {
-            const pct = total > 0 ? Math.round((context.raw / total) * 100) : 0
-            return ` ${context.label}: ${context.raw} (${pct}%)`
+          label: (context: TooltipItem<"doughnut">) => {
+            const rawVal = context.raw as number
+            const pct = total > 0 ? Math.round((rawVal / total) * 100) : 0
+            return ` ${context.label}: ${rawVal} (${pct}%)`
           }
         }
       },
