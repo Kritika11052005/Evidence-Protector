@@ -34,7 +34,7 @@ export default function Home() {
       formData.append("threshold", threshold.toString());
 
       try {
-        const uploadRes = await fetch("http://localhost:8000/analyze/upload", {
+        const uploadRes = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/analyze/upload`, {
           method: "POST",
           body: formData,
         });
@@ -42,7 +42,7 @@ export default function Home() {
         filename = data.metadata.file;
         setUploadedFilename(filename);
       } catch (err) {
-        setStreamLines(["[ERROR] Failed to upload file. Ensure backend is running at http://localhost:8000"]);
+        setStreamLines([`[ERROR] Failed to upload file. Ensure backend is reachable.`]);
         setIsAnalyzing(false);
         return;
       }
@@ -50,8 +50,8 @@ export default function Home() {
 
     // Connect to SSE
     const streamUrl = mode === "demo" 
-      ? `http://localhost:8000/stream/demo?threshold=${threshold}`
-      : `http://localhost:8000/stream/upload?filename=${filename}&threshold=${threshold}`;
+      ? `${process.env.NEXT_PUBLIC_API_URL}/stream/demo?threshold=${threshold}`
+      : `${process.env.NEXT_PUBLIC_API_URL}/stream/upload?filename=${filename}&threshold=${threshold}`;
 
     const eventSource = new EventSource(streamUrl);
 
@@ -68,7 +68,7 @@ export default function Home() {
   };
 
   const fetchFinalResults = async (mode: "demo" | "upload", threshold: number) => {
-    const url = mode === "demo" ? "http://localhost:8000/analyze/demo" : "http://localhost:8000/analyze/demo"; // Simplified
+    const url = mode === "demo" ? `${process.env.NEXT_PUBLIC_API_URL}/analyze/demo` : `${process.env.NEXT_PUBLIC_API_URL}/analyze/demo`; // Simplified
     try {
         const body = mode === "demo" ? JSON.stringify({ threshold }) : JSON.stringify({ threshold });
         const res = await fetch(url, {
@@ -85,7 +85,7 @@ export default function Home() {
 
   const downloadFile = (type: "json" | "html") => {
     const filename = activeMode === "demo" ? "HDFS_2k.log" : uploadedFilename;
-    window.open(`http://localhost:8000/download/${type}?filename=${filename}&threshold=60`, "_blank");
+    window.open(`${process.env.NEXT_PUBLIC_API_URL}/download/${type}?filename=${filename}&threshold=60`, "_blank");
   };
 
   return (
